@@ -1,0 +1,8 @@
+# ignore all the files in the .env file
+.env
+
+# ignore all the files in the student.db file
+student.db
+
+# ignore env file
+texttosqlproject/
