@@ -6,3 +6,6 @@ student.db
 
 # ignore env file
 texttosqlproject/
+
+# ignore pychache files
+__pycache__/
