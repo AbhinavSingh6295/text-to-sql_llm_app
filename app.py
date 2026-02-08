@@ -110,9 +110,48 @@ submit = st.button("Ask the question")
 if submit:
     response = get_gemini_response(question, prompt+base_prompt, schema_info, DB_TYPE)
     print(response)
-    data = read_sql_query(response, db_connection)
-    st.subheader("The response is:")
-    st.dataframe(data)
+
+    # Store the generated sql query in session state
+    st.session_state['generated_sql'] = response.strip()
+    st.session_state['query_executed'] = False
+
+# Display SQL Query editro if query has been generted
+if 'generated_sql' in st.session_state:
+    st.subheader("Generated SQL Query")
+    st.markdown("**Review and modify the SQL query if needed**")
+
+    ## Text area for editing the SQL query
+    modified_query = st.text_area(
+        "SQL Query:",
+        value=st.session_state['generated_sql'],
+        height=100,
+        key="sql_query_editor",
+        help="Edit the SQL query to improve performance or add additional filters"
+    )
+
+    # col1, col2 = st.columns(2)
+
+    # with col1:
+    execute_button = st.button("Execute Query")
+    # with col2:
+    #     regenrate_button = st.button("Regenerate Query", use_container_width=True)
+
+    if execute_button:
+        print(modified_query)
+        try:
+            st.session_state['generated_sql'] = modified_query
+            db_connection = DatabaseConnection(db_type=DB_TYPE)
+            db_connection.connect()
+            data = read_sql_query(modified_query, db_connection)
+            st.session_state['query_executed'] = True
+            st.session_state['query_results'] = data
+            st.success("Query executed successfully")
+        except Exception as e:
+            st.error(f"Error executing query: {str(e)}")
+
+    if st.session_state.get('query_executed', False) and 'query_results' in st.session_state:
+        st.subheader("Query Results:")
+        st.dataframe(st.session_state['query_results'])
 
 # Footer
 st.markdown("---")
