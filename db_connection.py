@@ -24,11 +24,11 @@ class DatabaseConnection:
         Returns:
             self.conn: Connection object
         """
-        if self.db_type == "sqllite":
+        if self.db_type == "SQLite":
             db_path = "student.db"
             self.connection = sqlite3.connect(db_path)
             return self.connection
-        elif self.db_type == "postgresql":
+        elif self.db_type == "PostgreSQL":
             DATABASE_USERNAME = os.getenv("DB_USER")
             DATABASE_PASSWORD = os.getenv("DB_PASSWORD")
             DATABASE_HOST = os.getenv("DB_HOST")
@@ -56,9 +56,9 @@ class DatabaseConnection:
         if not self.connection:
             self.connect()
 
-        if self.db_type == "sqllite":
+        if self.db_type == "SQLite":
             df = pd.read_sql_query(query, self.connection)
-        elif self.db_type == "postgresql":
+        elif self.db_type == "PostgreSQL":
             df = pd.read_sql_query(query, self.connection)
         else:
             raise Exception(f"Invalid database type: {self.db_type}")
@@ -75,7 +75,7 @@ class DatabaseConnection:
             schema_info: list of schema information
         """
         schema_info = []
-        if self.db_type == "sqllite":
+        if self.db_type == "SQLite":
             cursor = self.connection.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
             tables = cursor.fetchall()
@@ -87,7 +87,7 @@ class DatabaseConnection:
                 col_info = ", ".join([f"{col[1]}: {col[2]}" for col in columns])
                 schema_info.append(f"Table: {table_name}\nColumns: {col_info}\n")
 
-        elif self.db_type == "postgresql":
+        elif self.db_type == "PostgreSQL":
             query = f"""
             SELECT table_schema, table_name, column_name, data_type 
             FROM information_schema.columns 
@@ -106,8 +106,8 @@ class DatabaseConnection:
 
     def close(self):
         if self.connection:
-            if self.db_type == "sqllite":
+            if self.db_type == "SQLite":
                 self.connection.close()
-            elif self.db_type == "postgresql":
+            elif self.db_type == "PostgreSQL":
                 self.connection.close()
             self.connection = None

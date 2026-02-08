@@ -18,7 +18,7 @@ def get_gemini_response(question, promt, schema_info, db_type):
     if schema_info:
         full_prompt += f"\n\nDatabase Schema:\n{schema_info}"
      # Add PostgreSQL-specific instruction
-    if db_type == "postgresql":
+    if db_type == "PostgreSQL":
         full_prompt += "\n\nIMPORTANT: For PostgreSQL databases, you MUST use the full table name format: schema_name.table_name in all SQL queries. For example, use 'legacy_dm.fact_live_product_sales' instead of just 'fact_live_product_sales'."
     response = model.generate_content([full_prompt, question])
     return response.text
@@ -90,12 +90,12 @@ with st.sidebar:
     st.subheader("Database Configuration")
     DB_TYPE = st.selectbox(
         "Select Database Type",
-        options=["sqllite", "postgresql"],
+        options=["SQLite", "PostgreSQL"],
         index=0,
         help="Select the database type to connect to",
         key="db_type_selector"
     )
-    st.markdown(f"**Database Type**: {DB_TYPE}")
+    # st.markdown(f"**Database Type**: {DB_TYPE}")
 
 db_connection = DatabaseConnection(db_type=DB_TYPE)
 db_connection.connect()
