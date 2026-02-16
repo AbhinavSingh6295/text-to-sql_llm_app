@@ -13,7 +13,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 ## Pre-known schema and table options for dropdowns
 SCHEMA_TABLES = {
-    "legacy_dm": ["fact_live_product_sales", "flps_marketing"],
+    "legacy_dm": ["fact_live_product_sales", "flps_marketing", "delivery_data"],
 }
 
 ## Functio to google gemeni model and provide query as response
