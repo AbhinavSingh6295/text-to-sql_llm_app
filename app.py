@@ -11,6 +11,11 @@ from db_connection import DatabaseConnection
 ## configure the api key for the google generative ai
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
+## Pre-known schema and table options for dropdowns
+SCHEMA_TABLES = {
+    "legacy_dm": ["fact_live_product_sales", "flps_marketing"],
+}
+
 ## Functio to google gemeni model and provide query as response
 def get_gemini_response(question, promt, schema_info, db_type):
     model = genai.GenerativeModel(model_name="gemini-3-flash-preview")
@@ -95,11 +100,23 @@ with st.sidebar:
         help="Select the database type to connect to",
         key="db_type_selector"
     )
+    SCHEMA_OPTIONS = list(SCHEMA_TABLES.keys())
+    SELECTED_SCHEMA = st.selectbox(
+        "Schema",
+        options=SCHEMA_OPTIONS,
+        key="schema_selector"
+    )
+    TABLE_OPTIONS = SCHEMA_TABLES[SELECTED_SCHEMA]
+    SELECTED_TABLE = st.selectbox(
+        "Table",
+        options=TABLE_OPTIONS,
+        key="table_selector"
+    )
     # st.markdown(f"**Database Type**: {DB_TYPE}")
 
 db_connection = DatabaseConnection(db_type=DB_TYPE)
 db_connection.connect()
-schema_info = db_connection.get_schema_info()
+schema_info = db_connection.get_schema_info(schema_name=SELECTED_SCHEMA, table_name=SELECTED_TABLE)
 st.sidebar.success("Connected to the database")
 
 question = st.text_input("Input: ", key="input")
