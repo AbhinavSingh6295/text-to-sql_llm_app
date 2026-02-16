@@ -65,7 +65,7 @@ class DatabaseConnection:
         return df
  
 
-    def get_schema_info(self) -> str:
+    def get_schema_info(self, schema_name: str, table_name: str) -> str:
         """
         Get the schema information for a given table
         Args:
@@ -91,7 +91,7 @@ class DatabaseConnection:
             query = f"""
             SELECT table_schema, table_name, column_name, data_type 
             FROM information_schema.columns 
-            WHERE table_schema = 'legacy_dm' and table_name = 'fact_live_product_sales'
+            WHERE table_schema = '{schema_name}' and table_name = '{table_name}'
             ORDER BY table_name, ordinal_position
             LIMIT 100
             """
