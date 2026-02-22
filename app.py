@@ -7,6 +7,7 @@ import os
 import sqlite3
 import pandas as pd
 from db_connection import DatabaseConnection
+import sqlparse
 
 ## configure the api key for the google generative ai
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -132,15 +133,30 @@ if submit:
     st.session_state['generated_sql'] = response.strip()
     st.session_state['query_executed'] = False
 
+    st.session_state['sql_query_editor'] = sqlparse.format(
+        response.strip(),
+        reindent=True,
+        keyword_case='upper'
+    )
+
 # Display SQL Query editro if query has been generted
 if 'generated_sql' in st.session_state:
     st.subheader("Generated SQL Query")
     st.markdown("**Review and modify the SQL query if needed**")
 
+    # When displaying the SQL (e.g. in st.code):
+    formatted_sql = sqlparse.format(
+        st.session_state['generated_sql'],
+        reindent=True,
+        keyword_case='upper'
+    )
+    st.code(formatted_sql, language="sql")
+
     ## Text area for editing the SQL query
     modified_query = st.text_area(
         "SQL Query:",
-        value=st.session_state['generated_sql'],
+        # value=st.session_state['generated_sql'],
+        value = formatted_sql,
         height=100,
         key="sql_query_editor",
         help="Edit the SQL query to improve performance or add additional filters"
