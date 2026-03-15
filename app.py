@@ -14,7 +14,8 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 ## Pre-known schema and table options for dropdowns
 SCHEMA_TABLES = {
-    "legacy_dm": ["fact_live_product_sales", "flps_marketing", "delivery_data"],
+    "legacy_dm": ["fact_live_product_sales", "flps_marketing"],
+    "dw_edm":["fct_revenue_items"]
 }
 
 ## Functio to google gemeni model and provide query as response
@@ -96,7 +97,7 @@ with st.sidebar:
     st.subheader("Database Configuration")
     DB_TYPE = st.selectbox(
         "Select Database Type",
-        options=["SQLite", "PostgreSQL"],
+        options=["PostgreSQL"],
         index=0,
         help="Select the database type to connect to",
         key="db_type_selector"
@@ -122,12 +123,23 @@ st.sidebar.success("Connected to the database")
 
 question = st.text_input("Input: ", key="input")
 
+# col1, col2, col3 = st.columns([1.5, 1, 6])
+
+# with col1:
 submit = st.button("Ask the question")
+
+# with col2:
+#     clear_button = st.button("Clear")
+
+# if clear_button:
+#     st.session_state["input"] = ""
+#     st.rerun()
 
 # if submit is clicked
 if submit:
-    response = get_gemini_response(question, prompt+base_prompt, schema_info, DB_TYPE)
-    print(response)
+    with st.spinner("Getting response from Gemini ......"):
+        response = get_gemini_response(question, prompt+base_prompt, schema_info, DB_TYPE)
+    print ("Response from Gemini: ", response)
 
     # Store the generated sql query in session state
     st.session_state['generated_sql'] = response.strip()
